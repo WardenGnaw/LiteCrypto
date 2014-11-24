@@ -16,6 +16,9 @@
 #define IPV4_AND_UDP_HEADER_SIZE (IPV4_HEADER_SIZE + UDP_HEADER_SIZE)
 #define crypto_onetimeauth_key_and_bytes (crypto_onetimeauth_KEYBYTES + crypto_onetimeauth_BYTES)
 
+#define SIGN_KEYBYTES crypto_auth_KEYBYTES  //tweetnacl: 32
+#define SIGN_BYTES crypto_auth_BYTES        //tweetnacl: 32
+
 typedef unsigned char u8;
 typedef unsigned long u32;
 typedef unsigned long long u64;
@@ -23,14 +26,25 @@ typedef long long i64;
 
 
 /*
- * 
+ * Authenticate IPv4 + UDP packet by HMAC-SHA512-256.
+ * Expects:
+ *  signed_data to have enough space for (size + SIGN_BYTES), it will fill that size.
+ *  key to be SIGN_KEYBYTES long
+ *
+ * Returns: size of signed_data
  */
-u64 packet_sign(u8 *key, u8 **data, u64 size);
+u64 packet_sign(u8 *signed_data, u8 *key, u8 *data, u64 size);
 
 /*
- * 
+ * Verify authentication of a signed packet
+ * Expects:
+ *  output to have enough space for (signed_size - SIGN_BYTES), it will fill that size.
+ *  key to be SIGN_KEYBYTES long
+ *
+ * Returns:
+ *  0 if verified, -1 if not.
  */
-u64 packet_verify(u8 *key, u8 **message, u64 message_length);
+u64 packet_verify(u8 *output, u8 *key, u8 *signed_data, u64 signed_size);
 
 /*
  * 
