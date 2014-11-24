@@ -807,3 +807,76 @@ int crypto_sign_open(u8 *m,u64 *mlen,const u8 *sm,u64 n,const u8 *pk)
   *mlen = n;
   return 0;
 }
+
+/**CRYPTO_AUTH FROM FULL NACL LIBRARY**/
+#define blocks crypto_hashblocks_sha512
+
+int crypto_auth(unsigned char *out,const unsigned char *in,unsigned long long inlen,const unsigned char *k)
+{
+  unsigned char h[64];
+  unsigned char padded[256];
+  int i;
+  unsigned long long bytes = 128 + inlen;
+
+  for (i = 0;i < 64;++i) h[i] = iv[i];
+
+  for (i = 0;i < 32;++i) padded[i] = k[i] ^ 0x36;
+  for (i = 32;i < 128;++i) padded[i] = 0x36;
+
+  blocks(h,padded,128);
+  blocks(h,in,inlen);
+  in += inlen;
+  inlen &= 127;
+  in -= inlen;
+
+  for (i = 0;i < inlen;++i) padded[i] = in[i];
+  padded[inlen] = 0x80;
+
+  if (inlen < 112) {
+    for (i = inlen + 1;i < 119;++i) padded[i] = 0;
+    padded[119] = bytes >> 61;
+    padded[120] = bytes >> 53;
+    padded[121] = bytes >> 45;
+    padded[122] = bytes >> 37;
+    padded[123] = bytes >> 29;
+    padded[124] = bytes >> 21;
+    padded[125] = bytes >> 13;
+    padded[126] = bytes >> 5;
+    padded[127] = bytes << 3;
+    blocks(h,padded,128);
+  } else {
+    for (i = inlen + 1;i < 247;++i) padded[i] = 0;
+    padded[247] = bytes >> 61;
+    padded[248] = bytes >> 53;
+    padded[249] = bytes >> 45;
+    padded[250] = bytes >> 37;
+    padded[251] = bytes >> 29;
+    padded[252] = bytes >> 21;
+    padded[253] = bytes >> 13;
+    padded[254] = bytes >> 5;
+    padded[255] = bytes << 3;
+    blocks(h,padded,256);
+  }
+
+  for (i = 0;i < 32;++i) padded[i] = k[i] ^ 0x5c;
+  for (i = 32;i < 128;++i) padded[i] = 0x5c;
+
+  for (i = 0;i < 64;++i) padded[128 + i] = h[i];
+  for (i = 0;i < 64;++i) h[i] = iv[i];
+
+  for (i = 64;i < 128;++i) padded[128 + i] = 0;
+  padded[128 + 64] = 0x80;
+  padded[128 + 126] = 6;
+
+  blocks(h,padded,256);
+  for (i = 0;i < 32;++i) out[i] = h[i];
+
+  return 0;
+}
+
+int crypto_auth_verify(const unsigned char *h,const unsigned char *in,unsigned long long inlen,const unsigned char *k)
+{
+  unsigned char correct[32];
+  crypto_auth(correct,in,inlen,k);
+  return crypto_verify_32(h,correct);
+}
