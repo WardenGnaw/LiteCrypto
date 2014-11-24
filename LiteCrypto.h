@@ -13,21 +13,15 @@
 
 #define IPV4_HEADER_SIZE 20
 #define UDP_HEADER_SIZE 4
-#define IPV4_AND_UDP_HEADER_SIZE 24
+#define IPV4_AND_UDP_HEADER_SIZE (IPV4_HEADER_SIZE + UDP_HEADER_SIZE)
 #define crypto_onetimeauth_key_and_bytes (crypto_onetimeauth_KEYBYTES + crypto_onetimeauth_BYTES)
 
 typedef unsigned char u8;
 typedef unsigned long u32;
 typedef unsigned long long u64;
 typedef long long i64;
-/*
-typedef struct  __attribute__ ((__packed__)) {
-   u8 ipv4_header[IPV4_HEADER_SIZE];
-   u8 udp_header[UDP_HEADER_SIZE];
-   u8 key[crypto_onetimeauth_KEYBYTES]; // defined in tweetnacl.h as 32
-   u8 auth[crypto_onetimeauth_BYTES];   // defined in tweetnacl.h as 16
-}  __attribute__ ((__packed__)) packet_header_struct;
-*/
+
+
 /*
  * 
  */
