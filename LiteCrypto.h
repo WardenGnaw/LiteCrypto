@@ -12,7 +12,7 @@
 #include <fcntl.h>
 
 #define IPV4_HEADER_SIZE 20
-#define UDP_HEADER_SIZE 4
+#define UDP_HEADER_SIZE 8
 #define IPV4_AND_UDP_HEADER_SIZE (IPV4_HEADER_SIZE + UDP_HEADER_SIZE)
 #define crypto_onetimeauth_key_and_bytes (crypto_onetimeauth_KEYBYTES + crypto_onetimeauth_BYTES)
 
