@@ -18,12 +18,23 @@
 
 #define SIGN_KEYBYTES crypto_auth_KEYBYTES  //tweetnacl: 32
 #define SIGN_BYTES crypto_auth_BYTES        //tweetnacl: 32
+#define KEY_SIZE crypto_hash_BYTES          //tweetnacl: 64
+
+#define KEY_DERIV_ITER 5000
+#define SALT_SIZE 16
 
 typedef unsigned char u8;
 typedef unsigned long u32;
 typedef unsigned long long u64;
 typedef long long i64;
 
+/*
+ * Deterministically derive a 32-byte key from a variable size input_key and salt (random bytes)
+ * Expects: 
+ *  output_key to have enough space for KEY_SIZE
+ *  salt to be of length SALT_SIZE
+ */
+u64 derive_key(u8 *output_key, u8 *input_key, u64 input_size, u8 *salt);
 
 /*
  * Authenticate IPv4 + UDP packet by HMAC-SHA512-256.
