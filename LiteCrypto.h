@@ -16,9 +16,11 @@
 #define IPV4_AND_UDP_HEADER_SIZE (IPV4_HEADER_SIZE + UDP_HEADER_SIZE)
 #define crypto_onetimeauth_key_and_bytes (crypto_onetimeauth_KEYBYTES + crypto_onetimeauth_BYTES)
 
-#define SIGN_KEYBYTES crypto_auth_KEYBYTES  //tweetnacl: 32
-#define SIGN_BYTES crypto_auth_BYTES        //tweetnacl: 32
-#define KEY_SIZE crypto_hash_BYTES          //tweetnacl: 64
+#define SIGN_KEYBYTES crypto_auth_KEYBYTES      //tweetnacl: 32
+#define SIGN_BYTES crypto_auth_BYTES            //tweetnacl: 32
+#define KEY_SIZE crypto_hash_BYTES              //tweetnacl: 64
+#define NONCE_BYTES crypto_stream_NONCEBYTES    //tweetnacl: 24
+#define ENCRYPT_KEYBYTES crypto_stream_KEYBYTES //tweetnacl: 32
 
 #define KEY_DERIV_ITER 5000
 #define SALT_SIZE 16
@@ -47,23 +49,58 @@ u64 derive_key(u8 *output_key, u8 *input_key, u64 input_size, u8 *salt);
 u64 packet_sign(u8 *signed_data, u8 *key, u8 *data, u64 size);
 
 /*
- * Verify authentication of a signed packet
+ * Verify authentication of a signed IPv4 + UDP packet by HMAC-SHA512-256.
  * Expects:
  *  output to have enough space for (signed_size - SIGN_BYTES), it will fill that size.
  *  key to be SIGN_KEYBYTES long
  *
  * Returns:
- *  0 if verified, -1 if not.
+ *  size of output if verified, -1 if not.
  */
 u64 packet_verify(u8 *output, u8 *key, u8 *signed_data, u64 signed_size);
 
 /*
- * 
+ * Encrypts data of a IPv4 + UDP packet by xsalsa20.
+ * Expects:
+ *  output to have enough space for (size + NONCE_BYTES), it will fill that size.
+ *  key to be ENCRYPT_KEYBYTES long
+ *
+ * Returns: size of output
  */
-u64 packet_encrypt(u8* output, u8* key, u8 *data, u64 size);
+u64 packet_encrypt(u8 *output, u8 *key, u8 *data, u64 size);
 
 /*
- * 
+ * Decrypts data of an encrypted IPv4 + UDP packet by xsalsa20.
+ * Expects:
+ *  output to have enough space for (size - NONCE_BYTES), it will fill that size.
+ *  key to be ENCRYPT_KEYBYTES long
+ *
+ * Returns: size of output
  */
-u64 packet_decrypt(u8* output, u8* key, u8 *data, u64 size);
+u64 packet_decrypt(u8 *output, u8 *key, u8 *data, u64 size);
+
+/*
+ * Encrypts data of a IPv4 + UDP packet by xsalsa20 and
+ * authenticate IPv4 + UDP packet by HMAC-SHA512-256.
+ *
+ * Expects:
+ *  output to have enough space for (size + NONCE_BYTES + SIGN_BYTES), it will fill that size.
+ *  key to be ENCRYPT_KEYBYTES long
+ *
+ * Returns: size of signed_data on success or -1 on failure
+ */
+u64 packet_encrypt_sign(u8 *signed_data, u8 *key, u8 *data, u64 size);
+
+/*
+ * Verify IPv4 + UDP packet by HMAC-SHA512-256, if verified then
+ *  decrypts data of a IPv4 + UDP packet by xsalsa20
+ *
+ * Expects:
+ *  output to have enough space for (size - NONCE_BYTES - SIGN_BYTES), it will fill that size.
+ *  key to be ENCRYPT_KEYBYTES long
+ *
+ * Returns: size of output on success or -1 on failure
+ */
+u64 packet_verify_decrypt(u8 *output, u8 *key, u8 *signed_data, u64 signed_size);
+
 #endif
