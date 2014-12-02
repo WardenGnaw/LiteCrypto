@@ -63,9 +63,10 @@ int main(int argc, char **argv) {
                                          MY_MSG_LEN);
    printf("\nSigned Encrypted Message:\n");
    printHex(signed_encryptedMessage, signed_size);
-
-   memset(signed_encryptedMessage, 0, 1);
-
+/*
+   printf("\nMessed Encrypted Message:\n");
+   printHex(signed_encryptedMessage, signed_size);
+*/
    int decrypted_size = packet_verify_decrypt(message, key, signed_encryptedMessage,
                                        signed_size);
    if (decrypted_size > 0) {

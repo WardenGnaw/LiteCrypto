@@ -1,14 +1,12 @@
-all:
+all: driver
+driver: libLiteCrypto.a driver.c
+	cc -Os driver.c libLiteCrypto.a -o driver
+libLiteCrypto.a: tweetnacl.c LiteCrypto.c
 	cc -fPIC -c tweetnacl.c -Os
 	cc -fPIC -c LiteCrypto.c -Os
 	ar rc libLiteCrypto.a tweetnacl.o LiteCrypto.o
 	ranlib libLiteCrypto.a
-LiteCrypto:
-	cc -fPIC -c tweetnacl.c -Os
-	cc -fPIC -c LiteCrypto.c -Os
-	ar rc libLiteCrypto.a tweetnacl.o LiteCrypto.o
-	ranlib libLiteCrypto.a
-driver: LiteCrypto driver.c
-	gcc -Os driver.c libLiteCrypto.a -o driver
+%.c: %.h
+	touch $@
 clean:
-	rm libLiteCrypto.a tweetnacl.o LiteCrypto.o
+	rm libLiteCrypto.a tweetnacl.o LiteCrypto.o driver
