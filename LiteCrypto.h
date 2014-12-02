@@ -21,6 +21,7 @@
 #define KEY_SIZE crypto_hash_BYTES              //tweetnacl: 64
 #define NONCE_BYTES crypto_stream_NONCEBYTES    //tweetnacl: 24
 #define ENCRYPT_KEYBYTES crypto_stream_KEYBYTES //tweetnacl: 32
+#define SIGN_AND_NONCE_BYTES (SIGN_BYTES + NONCE_BYTES)
 
 #define KEY_DERIV_ITER 5000
 #define SALT_SIZE 16

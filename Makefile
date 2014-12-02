@@ -1,6 +1,6 @@
-all: driver
-driver: libLiteCrypto.a driver.c
-	cc -Os driver.c libLiteCrypto.a -o driver
+all: testDriver
+testDriver: libLiteCrypto.a testDriver.c
+	cc -Os testDriver.c libLiteCrypto.a -o testDriver
 libLiteCrypto.a: tweetnacl.c LiteCrypto.c
 	cc -fPIC -c tweetnacl.c -Os
 	cc -fPIC -c LiteCrypto.c -Os
@@ -9,4 +9,4 @@ libLiteCrypto.a: tweetnacl.c LiteCrypto.c
 %.c: %.h
 	touch $@
 clean:
-	rm libLiteCrypto.a tweetnacl.o LiteCrypto.o driver
+	rm libLiteCrypto.a tweetnacl.o LiteCrypto.o testDriver
