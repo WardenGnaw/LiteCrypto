@@ -64,12 +64,33 @@ u64 packet_verify(u8 *output, u8 *key, u8 *signed_data, u64 signed_size) {
    return crypto_auth_verify(authorization, output, signed_size - SIGN_BYTES, key);
 }
 
-u64 packet_secret_box(u8 **data, u64 size) {
+u64 packet_encrypt(u8 *output, u8* key, u8 *data, u64 size) {
+   u8 nonce[crypto_stream_NONCEBYTES];
+
+   randombytes(nonce, crypto_stream_NONCEBYTES);
+
+   crypto_stream_xor(output + crypto_stream_NONCEBYTES + IPV4_AND_UDP_HEADER_SIZE, 
+                     data + IPV4_AND_UDP_HEADER_SIZE, size - IPV4_AND_UDP_HEADER_SIZE, 
+                     nonce, key);
    
-   return 0;
+   
+   memcpy(output, data, IPV4_AND_UDP_HEADER_SIZE);
+   memcpy(output + IPV4_AND_UDP_HEADER_SIZE, nonce, crypto_stream_NONCEBYTES);
+   
+   return size + crypto_stream_NONCEBYTES;
 }
 
-u64 packet_open_secret_box(u8 **data, u64 size) {
+u64 packet_decrypt(u8 *output, u8* key, u8 *data, u64 size) {
+   u8 nonce[crypto_stream_NONCEBYTES];
 
-   return 0;
+   memcpy(nonce, output + IPV4_AND_UDP_HEADER_SIZE, crypto_stream_NONCEBYTES);
+   
+   crypto_stream_xor(output + IPV4_AND_UDP_HEADER_SIZE, 
+                     data + crypto_stream_NONCEBYTES + IPV4_AND_UDP_HEADER_SIZE, 
+                     size - IPV4_AND_UDP_HEADER_SIZE - crypto_stream_NONCEBYTES, nonce, key);
+   
+   
+   memcpy(output, data, IPV4_AND_UDP_HEADER_SIZE);
+
+   return size - crypto_stream_NONCEBYTES;
 }

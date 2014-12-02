@@ -60,10 +60,10 @@ u64 packet_verify(u8 *output, u8 *key, u8 *signed_data, u64 signed_size);
 /*
  * 
  */
-u64 packet_secret_box(u8 **data, u64 size);
+u64 packet_encrypt(u8* output, u8* key, u8 *data, u64 size);
 
 /*
  * 
  */
-u64 packet_open_secret_box(u8 **data, u64 size);
+u64 packet_decrypt(u8* output, u8* key, u8 *data, u64 size);
 #endif
