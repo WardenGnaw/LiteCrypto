@@ -125,7 +125,7 @@ i64 packet_encrypt_sign(u8 *signed_data, u8 *key, u8 *data, i64 size) {
 i64 packet_verify_decrypt(u8 *output, u8 *key, u8 *signed_data, i64 signed_size) {
    u8 *aux_data;
    if (output && key && signed_data &&
-       signed_size >= (IPV4_AND_UDP_HEADER_SIZE + SIGN_BYTES + NONCE_BYTES)) {
+       signed_size >= (IPV4_AND_UDP_HEADER_SIZE + SIGN_AND_NONCE_BYTES)) {
       aux_data = malloc(signed_size - NONCE_BYTES);
       i64 rtnSize = -1;
       if (aux_data) {

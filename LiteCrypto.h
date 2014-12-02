@@ -32,7 +32,8 @@ typedef unsigned long long u64;
 typedef long long i64;
 
 /*
- * Deterministically derive a 32-byte key from a variable size input_key and salt (random bytes)
+ * Deterministically derive a KEY_SIZE length key from a variable size
+ *  input_key and salt (random bytes)
  * Expects: 
  *  output_key to have enough space for KEY_SIZE
  *  salt to be of length SALT_SIZE
@@ -61,7 +62,7 @@ i64 packet_sign(u8 *signed_data, u8 *key, u8 *data, i64 size);
 i64 packet_verify(u8 *output, u8 *key, u8 *signed_data, i64 signed_size);
 
 /*
- * Encrypts data of a IPv4 + UDP packet by xsalsa20.
+ * Encrypts data of a IPv4 + UDP packet by xsalsa20 stream cipher.
  * Expects:
  *  output to have enough space for (size + NONCE_BYTES), it will fill that size.
  *  key to be ENCRYPT_KEYBYTES long
@@ -71,7 +72,7 @@ i64 packet_verify(u8 *output, u8 *key, u8 *signed_data, i64 signed_size);
 i64 packet_encrypt(u8 *output, u8 *key, u8 *data, i64 size);
 
 /*
- * Decrypts data of an encrypted IPv4 + UDP packet by xsalsa20.
+ * Decrypts data of an encrypted IPv4 + UDP packet by xsalsa20 stream cipher.
  * Expects:
  *  output to have enough space for (size - NONCE_BYTES), it will fill that size.
  *  key to be ENCRYPT_KEYBYTES long
@@ -81,7 +82,7 @@ i64 packet_encrypt(u8 *output, u8 *key, u8 *data, i64 size);
 i64 packet_decrypt(u8 *output, u8 *key, u8 *data, i64 size);
 
 /*
- * Encrypts data of a IPv4 + UDP packet by xsalsa20 and
+ * Encrypts data of a IPv4 + UDP packet by xsalsa20 stream cipher and
  * authenticate IPv4 + UDP packet by HMAC-SHA512-256.
  *
  * Expects:
@@ -94,7 +95,7 @@ i64 packet_encrypt_sign(u8 *signed_data, u8 *key, u8 *data, i64 size);
 
 /*
  * Verify IPv4 + UDP packet by HMAC-SHA512-256, if verified then
- *  decrypts data of a IPv4 + UDP packet by xsalsa20
+ *  decrypts data of a IPv4 + UDP packet by xsalsa20 stream cipher.
  *
  * Expects:
  *  output to have enough space for (size - NONCE_BYTES - SIGN_BYTES), it will fill that size.
