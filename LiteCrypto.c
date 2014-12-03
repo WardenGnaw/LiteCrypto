@@ -9,26 +9,47 @@ void randombytes(u8 *output,u64 size) {
    close(fd);
 }
 
+#define KEY_DERIV_ITER 5000
+
 i64 derive_key(u8 *output_key, u8 *input_key, i64 input_size, u8 *salt) {
-   u8 aux[2*(KEY_SIZE + SALT_SIZE)];
-   u8 *aux2 = aux + KEY_SIZE + SALT_SIZE;
-   u32 count;
+   u8 *aux1, *aux2, *block1, *block2;
+   u32 count, ndx;
    
-   if (!output_key || !input_key || !salt || input_size < 0) {
+   if (!output_key || !input_key || !salt || input_size <= 0) {
       return -1;
    }
    
-   //set salt
-   memcpy(aux + KEY_SIZE, salt, SALT_SIZE);
-   memcpy(aux2 + KEY_SIZE, salt, SALT_SIZE);
-   
-   crypto_hash(aux, input_key, input_size);
-   for (count = 0; count < KEY_DERIV_ITER; ++count) {
-      crypto_hash(aux2, aux, KEY_SIZE + SALT_SIZE);
-      crypto_hash(aux, aux2, KEY_SIZE + SALT_SIZE);
+   //crypto_hash_BYTES > SALT_SIZE, we have no INT(i) since we limit keySize
+   //to 32 bytes which is less than 64 byte digest of crypto_hash
+   aux1 = malloc(2*(input_size + crypto_hash_BYTES));
+   if (!aux1) {
+      return -1;
    }
-   crypto_hash(output_key, aux, KEY_SIZE + SALT_SIZE);
+   block1 = aux1 + input_size;
+   aux2 = aux1 + input_size + crypto_hash_BYTES;
+   block2 = aux2 + input_size;
    
+   //initialize
+   memcpy(aux1, input_key, input_size);
+   memcpy(block1, salt, SALT_SIZE);
+   memcpy(aux2, input_key, input_size);
+   crypto_hash(block2, aux1, input_size + SALT_SIZE);
+   memcpy(output_key, block2, KEY_SIZE);  //copy over U1 to key
+   
+   for (count = 0; count < KEY_DERIV_ITER; ++count) {
+      crypto_hash(block1, aux2, input_size + crypto_hash_BYTES);
+      //perform XOR with Ui on current U so far in key
+      for (ndx = 0; ndx < KEY_SIZE; ++ndx) {
+         output_key[ndx] = output_key[ndx] ^ block1[ndx];
+      }
+      crypto_hash(block2, aux1, input_size + crypto_hash_BYTES);
+      for (ndx = 0; ndx < KEY_SIZE; ++ndx) {
+         output_key[ndx] = output_key[ndx] ^ block2[ndx];
+      }
+   }
+   
+   memset(aux1, 0, 2*(input_size + crypto_hash_BYTES));  //clear our data
+   free(aux1);
    return KEY_SIZE;
 }
 

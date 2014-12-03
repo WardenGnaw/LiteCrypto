@@ -18,12 +18,11 @@
 
 #define SIGN_KEYBYTES crypto_auth_KEYBYTES      //tweetnacl: 32
 #define SIGN_BYTES crypto_auth_BYTES            //tweetnacl: 32
-#define KEY_SIZE crypto_hash_BYTES              //tweetnacl: 64
 #define NONCE_BYTES crypto_stream_NONCEBYTES    //tweetnacl: 24
 #define ENCRYPT_KEYBYTES crypto_stream_KEYBYTES //tweetnacl: 32
 #define SIGN_AND_NONCE_BYTES (SIGN_BYTES + NONCE_BYTES)
 
-#define KEY_DERIV_ITER 5000
+#define KEY_SIZE ENCRYPT_KEYBYTES
 #define SALT_SIZE 16
 
 typedef unsigned char u8;
@@ -37,6 +36,9 @@ typedef long long i64;
  * Expects: 
  *  output_key to have enough space for KEY_SIZE
  *  salt to be of length SALT_SIZE
+ *
+ * Returns:
+ *  KEY_SIZE on success, -1 on failure
  */
 extern i64 derive_key(u8 *output_key, u8 *input_key, i64 input_size, u8 *salt);
 
