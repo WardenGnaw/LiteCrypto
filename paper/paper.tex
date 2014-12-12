@@ -14,8 +14,6 @@
   {}
 \appto{\endthebibliography}{\end{multicols}}
 
-\usepackage{hyperref}
-
 \usepackage{titlesec}
 \usepackage{flushend}
 \expandafter\def\expandafter\UrlBreaks\expandafter{\UrlBreaks%  save the current one
@@ -86,7 +84,7 @@ Our library should allow any user to have the option to encrypt or authenticate 
     \includegraphics[width=7cm]{researchDiagram.png}
 \endgroup
 \section{Related Work/Research}
-We began our research by looking for current satellite encryption. We found a paper on AES (Advanced Encryption Standard) with LDPC (Low Density Parity Check Code) in order to design a secure and reliable error correction method. \cite{SEEC} We also found that stream ciphers lead to serious problems if used incorrectly for satellite applications. \cite{stream_problems} We discovered someone else's work to authenticate IP protocol. \cite{IP_Protocol} In order to meet the low overhead requirement we found a low cost one-way HMAC proposal for a RFID system. \cite{HMAC_RFID} With all of this information, we needed a light weight software library for encryption to use. 
+We began our research by looking for current satellite encryption. We found a paper on AES (Advanced Encryption Standard) with LDPC (Low Density Parity Check Code) in order to design a secure and reliable error correction method. \cite{SEEC} We also found that stream ciphers lead to serious problems if used incorrectly for satellite applications. \cite{streamproblems} We discovered someone else's work to authenticate IP protocol. \cite{IPProtocol} In order to meet the low overhead requirement we found a low cost one-way HMAC proposal for a RFID system. \cite{HMACRFID} With all of this information, we needed a light weight software library for encryption to use. 
 \subsection{CyaSSL (wolfSSL)}
 CyaSSL is a lightweight SSL/TLS library. It advertised a special build called LeanPSK, which was an implementation of CyaSSL that could be built in as little as 20 kilobytes. LeanPSK is also 20 times smaller than OpenSSL, and uses 1 to 36 kilobytes of memory. This configuration required pre-shared keys. \cite{CyaSSL} However, after creating the binary ourselves and using their library, we found it to be complicated to build and the binary ended up to be 57 kilobytes. That was above our binary size requirement so we looked for a different library to use. 
 \subsection{NaCl}
@@ -151,7 +149,7 @@ Forward Secrecy would allow for past communications to stay private even when an
 \subsubsection{Sequence Numbers}
 This would prevent replay attacks. Because communication to the Cubesat is not stable, packets are resent continuously while the cubesat is in range. This increases the chance that the Cubesat has received the packet. With unstable communication, if the Cubesat did receive the packet, a response packet may not be received by the sender. This form of communication means that the process of repeating the message to the Cubesat can cause a replay attack by an official source. While replaying a command may not affect the mission, there is concern when it is crucial for the Cubesat to receive the command only once. Such commands include movement, a concept that may be implemented in Cubesats in the future. If movement is implemented in the Cubesat, the Cubesat cannot be allowed to replay a movement otherwise there is the possibility the Cubesat can be knocked out of orbit or into another satellite. The simplest way to mitigate this risk is through sequence numbers. Because the official source would issue out one sequence number per command, a repeated packet would not affect the Cubesat once it parses the packet. As long as encryption remains secure, there is no concern over another entity forging a sequence number. This leads to the last case, a used sequence number with a different command. The only time this would happen through non-malicious means is if sequence number exceeds the amount of numbers allowed. In this situation, there should be some sort of authentication to alert the Cubesat that the sequence number should be reset. In the case of a sequence reset, measures should be taken so that an attacker collecting old packets cannot then send them to the Cubesat in attempts to get the Cubesat to perform a task.
 \section{Conclusion}
-The LiteCrypto library is available at \href{https://github.com/WardenGnaw/LiteCrypto}{https://github.com/WardenGnaw/LiteCrypto}. It is available for anyone to use and modify. After further testing with CubeSat, LiteCrypto will hopefully be integrated for use.
+The LiteCrypto library is available at \url{https://github.com/WardenGnaw/LiteCrypto}. It is available for anyone to use and modify. After further testing with CubeSat, LiteCrypto will hopefully be integrated for use.
 
 From this this project, we have learned that we should not roll our own crypto,  keep libraries small and simple, and the last important lesson is always to deal with it.
 \end{multicols}
