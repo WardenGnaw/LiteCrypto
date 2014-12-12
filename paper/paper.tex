@@ -14,6 +14,8 @@
   {}
 \appto{\endthebibliography}{\end{multicols}}
 
+\usepackage{hyperref}
+
 \usepackage{titlesec}
 \usepackage{flushend}
 \expandafter\def\expandafter\UrlBreaks\expandafter{\UrlBreaks%  save the current one
@@ -149,7 +151,7 @@ Forward Secrecy would allow for past communications to stay private even when an
 \subsubsection{Sequence Numbers}
 This would prevent replay attacks. Because communication to the Cubesat is not stable, packets are resent continuously while the cubesat is in range. This increases the chance that the Cubesat has received the packet. With unstable communication, if the Cubesat did receive the packet, a response packet may not be received by the sender. This form of communication means that the process of repeating the message to the Cubesat can cause a replay attack by an official source. While replaying a command may not affect the mission, there is concern when it is crucial for the Cubesat to receive the command only once. Such commands include movement, a concept that may be implemented in Cubesats in the future. If movement is implemented in the Cubesat, the Cubesat cannot be allowed to replay a movement otherwise there is the possibility the Cubesat can be knocked out of orbit or into another satellite. The simplest way to mitigate this risk is through sequence numbers. Because the official source would issue out one sequence number per command, a repeated packet would not affect the Cubesat once it parses the packet. As long as encryption remains secure, there is no concern over another entity forging a sequence number. This leads to the last case, a used sequence number with a different command. The only time this would happen through non-malicious means is if sequence number exceeds the amount of numbers allowed. In this situation, there should be some sort of authentication to alert the Cubesat that the sequence number should be reset. In the case of a sequence reset, measures should be taken so that an attacker collecting old packets cannot then send them to the Cubesat in attempts to get the Cubesat to perform a task.
 \section{Conclusion}
-The LiteCrypto library is available at https://github.com/WardenGnaw/LiteCrypto. It is available for anyone to use and modify. After further testing with CubeSat, LiteCrypto will hopefully be integrated for use.
+The LiteCrypto library is available at \href{https://github.com/WardenGnaw/LiteCrypto}{https://github.com/WardenGnaw/LiteCrypto}. It is available for anyone to use and modify. After further testing with CubeSat, LiteCrypto will hopefully be integrated for use.
 
 From this this project, we have learned that we should not roll our own crypto,  keep libraries small and simple, and the last important lesson is always to deal with it.
 \end{multicols}
